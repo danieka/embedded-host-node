@@ -4,10 +4,11 @@
 
 import {promises as fs} from 'fs';
 import {resolve} from 'path';
+import * as del from 'del';
 
 import {PromiseOr} from '../../lib/src/utils';
 
-const sandboxDir = 'sandbox';
+const sandboxDir = resolve('sandbox');
 
 /**
  * Runs `test` within a sandbox directory.
@@ -22,13 +23,15 @@ export async function run(
     sassPathDirs?: string[];
   }
 ): Promise<void> {
+  const currDir = process.cwd();
+
   try {
-    await fs.rmdir(sandboxDir, {recursive: true});
+    del.sync(sandboxDir); // TODO(awjin): Use fs.rmSync() when we drop support for Node 12
   } catch {
     // noop
   } finally {
     await fs.mkdir(sandboxDir);
-    process.chdir(resolve(sandboxDir));
+    process.chdir(sandboxDir);
   }
 
   if (options?.sassPathDirs) {
@@ -43,9 +46,9 @@ export async function run(
     if (options?.sassPathDirs) {
       process.env.SASS_PATH = undefined;
     }
-    process.chdir(resolve('..'));
+    process.chdir(currDir);
     try {
-      await fs.rmdir(sandboxDir, {recursive: true});
+      del.sync(sandboxDir); // TODO(awjin): Use fs.rmSync() when we drop support for Node 12
     } catch {
       // noop
     }
