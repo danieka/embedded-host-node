@@ -25,14 +25,9 @@ export async function run(
 ): Promise<void> {
   const currDir = process.cwd();
 
-  try {
-    del.sync(sandboxDir); // TODO(awjin): Use fs.rmSync() when we drop support for Node 12
-  } catch {
-    // noop
-  } finally {
-    await fs.mkdir(sandboxDir);
-    process.chdir(sandboxDir);
-  }
+  del.sync(sandboxDir); // TODO(awjin): Use fs.rmSync() when we drop support for Node 12
+  await fs.mkdir(sandboxDir);
+  process.chdir(sandboxDir);
 
   if (options?.sassPathDirs) {
     process.env.SASS_PATH = options.sassPathDirs.join(
@@ -47,10 +42,6 @@ export async function run(
       process.env.SASS_PATH = undefined;
     }
     process.chdir(currDir);
-    try {
-      del.sync(sandboxDir); // TODO(awjin): Use fs.rmSync() when we drop support for Node 12
-    } catch {
-      // noop
-    }
+    del.sync(sandboxDir); // TODO(awjin): Use fs.rmSync() when we drop support for Node 12
   }
 }
